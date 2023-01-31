@@ -55,6 +55,7 @@ void GcodeSuite::M412() {
     SERIAL_ECHO_START();
     SERIAL_ECHOPGM("Filament runout ");
     serialprintln_onoff(runout.enabled);
+    SERIAL_ECHOLNPAIR("Filament runout host handling: ", runout.host_handling);
     #if HAS_FILAMENT_RUNOUT_DISTANCE
       SERIAL_ECHOLNPAIR("Filament runout distance (mm): ", runout.runout_distance());
     #endif

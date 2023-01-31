@@ -1615,7 +1615,7 @@ void RTSSHOW::RTS_HandleData(void)
         if(WITHIN((zprobe_zoffset + 0.05), -5.02, 5.02))
         {
           #if ENABLED(HAS_LEVELING)
-            zprobe_zoffset = (zprobe_zoffset + 0.05);
+            zprobe_zoffset = (zprobe_zoffset + 0.01);
             zprobe_zoffset = zprobe_zoffset - 0.0001;
           #endif
           babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);
@@ -1629,7 +1629,7 @@ void RTSSHOW::RTS_HandleData(void)
         if (WITHIN((zprobe_zoffset - 0.05), -5.02, 5.02))
         {
           #if ENABLED(HAS_LEVELING)
-            zprobe_zoffset = (zprobe_zoffset - 0.05);
+            zprobe_zoffset = (zprobe_zoffset - 0.01);
             zprobe_zoffset = zprobe_zoffset + 0.0001;
           #endif
           babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);

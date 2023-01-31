@@ -75,9 +75,11 @@
 #define ENDER_3S1_PRO
   
 // 主控芯片
-// #define USER_STM32F103  1
-#define USER_STM32F401  1
-
+#ifdef STM32F401xC
+  #define USER_STM32F401  1
+#else
+  #define USER_STM32F103  1
+#endif
 
 #if ENABLED(ENDER_3S1_PRO)
 
@@ -768,7 +770,7 @@
  * *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
  */
 #define PREVENT_COLD_EXTRUSION
-#define EXTRUDE_MINTEMP 170
+#define EXTRUDE_MINTEMP 180
 
 /**
  * Prevent a single extrusion longer than EXTRUDE_MAXLENGTH.
@@ -1230,7 +1232,7 @@
 // #define NOZZLE_TO_PROBE_OFFSET { -40, -50, 0 }  //(-40,-60,0)
   #define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0 }
 #else
-  #define NOZZLE_TO_PROBE_OFFSET { -40, -40, 0 }
+  #define NOZZLE_TO_PROBE_OFFSET { -31.5, -41.8, 0 }
 #endif
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1336,18 +1338,18 @@
  * readings with inductive probes and piezo sensors.
  探针时关闭加热：保证更精确的侧脸结果，防止电信号干扰
  */
-//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
-#if ENABLED(PROBING_HEATERS_OFF)
-  #define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
-  #define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)
-#endif
+#define PROBING_HEATERS_OFF       // Turn heaters off when probing
+// #if ENABLED(PROBING_HEATERS_OFF)
+  // #define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
+  // #define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)
+// #endif
 /*探针时还可以加一个延时和关闭风扇，进一步减少侧脸干扰。*/
 #define PROBING_FANS_OFF          // Turn fans off when probing
 //#define PROBING_STEPPERS_OFF      // Turn steppers off (unless needed to hold position) when probing
-//#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
+#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
 
 // Require minimum nozzle and/or bed temperature for probing
-#define PREHEAT_BEFORE_PROBING
+// #define PREHEAT_BEFORE_PROBING
 #if ENABLED(PREHEAT_BEFORE_PROBING)
   #define PROBING_NOZZLE_TEMP 70   // (°C) Only applies to E0 at this time
   #define PROBING_BED_TEMP    70
@@ -1428,8 +1430,8 @@
 #define X_MIN_POS -9
 #define Y_MIN_POS -6
 #define Z_MIN_POS 0
-#define X_MAX_POS X_BED_SIZE
-#define Y_MAX_POS Y_BED_SIZE
+#define X_MAX_POS X_BED_SIZE 
+#define Y_MAX_POS Y_BED_SIZE 
 #define Z_MAX_POS 270
 #endif
 
@@ -1641,10 +1643,10 @@
 /**
  * Auto-leveling needs preheating
  */
-//#define PREHEAT_BEFORE_LEVELING
+#define PREHEAT_BEFORE_LEVELING
 #if ENABLED(PREHEAT_BEFORE_LEVELING)
-  #define LEVELING_NOZZLE_TEMP 120   // (°C) Only applies to E0 at this time
-  #define LEVELING_BED_TEMP     50
+  #define LEVELING_NOZZLE_TEMP 70   // (°C) Only applies to E0 at this time
+  #define LEVELING_BED_TEMP    70
 #endif
 
 /**
