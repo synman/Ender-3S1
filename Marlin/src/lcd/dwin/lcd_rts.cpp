@@ -1343,22 +1343,39 @@ void RTSSHOW::RTS_HandleData(void)
       break;
 
     case ZoffsetEnterKey:
-      last_zoffset = zprobe_zoffset;
-      if(recdat.data[0] >= 32768)
       {
-        zprobe_zoffset = ((float)recdat.data[0] - 65536) / 100;
-        zprobe_zoffset -= 0.001;
+        last_zoffset = zprobe_zoffset;
+        float rec_zoffset = 0;
+        if(recdat.data[0] >= 32768) {
+          // zprobe_zoffset = ((float)recdat.data[0] - 65536) / 100;
+          // zprobe_zoffset -= 0.001;
+          rec_zoffset = ((float)recdat.data[0] - 65536) / 100;
+        } else {
+          // zprobe_zoffset = ((float)recdat.data[0]) / 100;
+          // zprobe_zoffset += 0.001;
+          rec_zoffset = ((float)recdat.data[0]) / 100;
+        }
+        if (rec_zoffset > last_zoffset) {
+          zprobe_zoffset = last_zoffset + .01;
+        } else {
+          zprobe_zoffset = last_zoffset - .01;
+        }
+        if(WITHIN((zprobe_zoffset), Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX)) {
+          SERIAL_ECHOPGM("ZoffsetEnterKey offset [");
+          SERIAL_ECHO(zprobe_zoffset);
+          SERIAL_ECHOPGM("] last [" );
+          SERIAL_ECHO(last_zoffset);
+          SERIAL_ECHOPGM("] sent [");
+          SERIAL_ECHO(zprobe_zoffset - last_zoffset);
+          SERIAL_ECHOLNPGM("]");
+          babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);
+        } else {
+          zprobe_zoffset = last_zoffset;
+        }
+
+        probe.offset.z = zprobe_zoffset;
+        RTS_SndData(zprobe_zoffset * 100, AUTO_BED_LEVEL_ZOFFSET_VP);
       }
-      else
-      {
-        zprobe_zoffset = ((float)recdat.data[0]) / 100;
-        zprobe_zoffset += 0.001;
-      }
-      if(WITHIN((zprobe_zoffset), Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX))
-      {
-        babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);
-      }
-      probe.offset.z = zprobe_zoffset;
       // settings.save();
       break;
 
@@ -1612,12 +1629,13 @@ void RTSSHOW::RTS_HandleData(void)
       else if(recdat.data[0] == 2)
       {
         last_zoffset = zprobe_zoffset;
-        if(WITHIN((zprobe_zoffset + 0.05), -5.02, 5.02))
+        if(WITHIN((zprobe_zoffset + 0.01), -10.01, 10.01))
         {
           #if ENABLED(HAS_LEVELING)
             zprobe_zoffset = (zprobe_zoffset + 0.01);
             zprobe_zoffset = zprobe_zoffset - 0.0001;
           #endif
+
           babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);
           probe.offset.z = zprobe_zoffset;
         }
@@ -1626,12 +1644,13 @@ void RTSSHOW::RTS_HandleData(void)
       else if(recdat.data[0] == 3)
       {
         last_zoffset = zprobe_zoffset;
-        if (WITHIN((zprobe_zoffset - 0.05), -5.02, 5.02))
+        if (WITHIN((zprobe_zoffset - 0.01), -10.01, 10.01))
         {
           #if ENABLED(HAS_LEVELING)
             zprobe_zoffset = (zprobe_zoffset - 0.01);
             zprobe_zoffset = zprobe_zoffset + 0.0001;
           #endif
+
           babystep.add_mm(Z_AXIS, zprobe_zoffset - last_zoffset);
           probe.offset.z = zprobe_zoffset;
         }
@@ -2757,6 +2776,7 @@ void RTSSHOW::RTS_HandleData(void)
           if(errorway == 4)
           {
             // reboot
+            SERIAL_ECHOPAIR("\ncase ErrorKey:", "LCD wants a reboot");
             HAL_reboot();
           }
         }
